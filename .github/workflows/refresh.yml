@@ -1,0 +1,27 @@
+name: Refresh technicals (hourly)
+on:
+  schedule:
+    - cron: "50 3-10 * * 1-5"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: python refresh.py
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/snapshot.csv
+          git commit -m "Update technicals snapshot" || echo "No changes"
+          git pull --rebase
+          git push
