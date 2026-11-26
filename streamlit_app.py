@@ -21,6 +21,7 @@ pages = [
     st.Page("views/ratings.py", title="Technical Ratings", icon="📊", default=True),
     st.Page("views/rsi.py", title="RSI", icon="📉"),
     st.Page("views/returns.py", title="Returns & Sharpe", icon="📈"),
+    st.Page("views/minervini.py", title="Minervini Trend Template", icon="🏆"),
 ]
 nav = st.navigation(pages)
 common.chrome()

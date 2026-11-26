@@ -210,6 +210,23 @@ def build_row(daily: pd.DataFrame, hourly, weekly, monthly) -> dict:
 
     dc = _naive(daily["Close"])
     row["Price"] = float(dc.iloc[-1])
+
+    # --- Minervini trend-template inputs
+    n = len(dc)
+    for w in (50, 150, 200):
+        row[f"SMA {w}"] = float(dc.rolling(w).mean().iloc[-1]) if n >= w else np.nan
+    sma200 = dc.rolling(200).mean()
+    row["SMA200 1M %"] = _pct(sma200.iloc[-1], sma200.iloc[-22]) if n >= 222 else np.nan
+    row["SMA200 4M %"] = _pct(sma200.iloc[-1], sma200.iloc[-85]) if n >= 285 else np.nan
+    hi = _naive(daily["High"]).tail(252)
+    lo = _naive(daily["Low"]).tail(252)
+    row["52W High"] = float(hi.max()) if len(hi) else np.nan
+    row["52W Low"] = float(lo.min()) if len(lo) else np.nan
+    if n >= 253:
+        p = lambda k: dc.iloc[-1] / dc.iloc[-1 - k] - 1
+        row["RS Raw"] = float(0.4 * p(63) + 0.2 * p(126) + 0.2 * p(189) + 0.2 * p(252))
+    else:
+        row["RS Raw"] = np.nan
     row["1D %"] = _pct(dc.iloc[-1], dc.iloc[-2]) if len(dc) > 1 else np.nan
     row["1W %"] = _since(dc, pd.Timedelta(days=7))
     row["1M %"] = _since(dc, pd.DateOffset(months=1))
@@ -247,6 +264,9 @@ def compute_all(progress: Optional[Callable[[float, str], None]] = None) -> pd.D
         raise RuntimeError("No data returned from Yahoo Finance")
     for tf in ROW_TFS:
         scores[tf] = scores[tf].map(score_to_rating)
+    # Relative-strength rating (1-99): percentile rank of weighted 12-month performance
+    scores["RS Rating"] = (scores["RS Raw"].rank(pct=True) * 99).round().clip(1, 99)
+    scores = scores.drop(columns=["RS Raw"])
     out = uni.merge(scores, on="Symbol", how="inner")
     if progress:
         progress(1.0, "Done")
@@ -273,7 +293,7 @@ def load_snapshot() -> tuple[Optional[pd.DataFrame], Optional[pd.Timestamp], str
     return parse_snapshot(pd.read_csv(SNAPSHOT_PATH))
 
 
-REQUIRED_COLUMNS = ["Symbol", "Sharpe 12M", "RSI Daily", "1H %", "1M %"]
+REQUIRED_COLUMNS = ["Symbol", "Sharpe 12M", "RSI Daily", "1H %", "1M %", "RS Rating", "SMA 200", "52W High"]
 
 
 def snapshot_meta() -> tuple[Optional[pd.Timestamp], str]:

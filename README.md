@@ -10,6 +10,7 @@ Yahoo Finance data only**.
 |---|---|---|
 | **Technical Ratings** | Strong Buy → Strong Sell for 1H, 2H, 4H, Daily, Weekly, Monthly | One-click *Strong Buy / Buy / Sell / Strong Sell on all timeframes* (with counts), per-timeframe rating filters (AND/OR), search, industry |
 | **RSI** | RSI(14) for all six timeframes | One-click Buy (RSI ≥ 60) / Sell (RSI ≤ 40) with counts, timeframe picker (all / any), custom RSI range |
+| **Minervini Trend Template** | All 8 criteria as ✔/✘ per stock, score out of 8, SMAs 50/150/200, 200-SMA slope, 52-week high/low, % above low / below high, RS rating | One-click All 8 / 7+ / 6+, adjustable thresholds (RS, % above low, % from high, 200-SMA lookback), search, industry |
 | **Returns & Sharpe** | % change 1H, 2H, 1D, 1W, 1M and 12-month Sharpe ratio | One-click Sharpe ≥ 1 / ≥ 2, up/down on every period, min Sharpe / 1M % |
 
 Each page is a separate script (`views/`) and reads only the columns it needs
@@ -35,18 +36,23 @@ from the snapshot, so only the page you open is loaded.
   rating. Buy = all six are Buy or Strong Buy; Sell = all six are Sell or Strong Sell.
 - **RSI:** 14-period, Wilder smoothing, on the bars of each timeframe. ≥60 green (Buy zone), ≤40 red (Sell zone).
 - **Sharpe (12M):** (mean daily return − 6.5%/252) ÷ std of daily returns × √252 over
-  the last 252 trading days (needs ≥200 days). Change `RISK_FREE` in `engine.py`.
+  the last 252 trading days (needs ≥200 days). Change `RISK_FREE` in `tech_engine.py`.
 - **% change:** 1H / 2H vs. the close 1 / 2 hourly bars ago; 1D vs. previous close;
   1W / 1M vs. the last close on or before 7 days / 1 month ago.
 - 2h and 4h bars are built from hourly data anchored to the 09:15 IST open.
+
+- **Minervini Trend Template:** price above 150- and 200-day SMA; 150 above 200; 200-day rising
+  (1 or 4 months); 50 above 150 and 200; price above 50; ≥30% above 52-week low; within 25% of
+  52-week high; RS rating ≥ 70. **RS rating** = percentile (1–99) within the Nifty 1000 of
+  0.4×3M + 0.2×6M + 0.2×9M + 0.2×12M price change (similar to, not the same as, IBD's).
 
 ## Project layout
 ```
 streamlit_app.py     Entry point + navigation
 common.py            Data loading, refresh logic, styling
-engine.py            Yahoo Finance download + indicators/ratings
+tech_engine.py      Yahoo Finance download + indicators/ratings
 refresh.py           CLI used by the scheduled job
-views/               One script per page (ratings, rsi, returns)
+views/               One script per page (ratings, rsi, returns, minervini)
 data/ind_nifty1000_list.csv   Stock universe
 data/snapshot.csv    Latest computed data (auto-generated)
 .github/workflows/refresh.yml Hourly refresh job
