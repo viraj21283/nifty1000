@@ -76,7 +76,7 @@ sty = (show.style
        .map(common.signed_css, subset=["SMA200 1M %", "SMA200 4M %"])
        .format({**{k: "{:,.2f}" for k in num},
                 "SMA200 1M %": "{:+.2f}%", "SMA200 4M %": "{:+.2f}%",
-                "% above 52W Low": "{:.1f}%", "% below 52W High": "{:.1f}%",
+                "% above 52W Low": "{:.2f}%", "% below 52W High": "{:.2f}%",
                 "RS Rating": "{:.0f}"}, na_rep="–"))
 st.dataframe(sty, **common.STRETCH, height=680, hide_index=True,
              column_config={"Symbol": st.column_config.TextColumn(pinned=True)})
@@ -89,7 +89,7 @@ st.caption(
     "the Nifty 1000 of 0.4×3M + 0.2×6M + 0.2×9M + 0.2×12M price change, similar to, but not the same as, IBD's. "
     "52-week high/low use daily highs/lows. Stocks with under ~1 year of history fail the criteria they can't be tested on."
 )
-export = show.copy()
+export = show.copy().round(2)
 export[CRIT] = export[CRIT].replace({"✔": "Yes", "✘": "No"})  # plain text filters cleanly in Excel
 st.download_button("⬇ Download CSV", export.to_csv(index=False).encode("utf-8-sig"),
                    "minervini_trend_template.csv", "text/csv")
