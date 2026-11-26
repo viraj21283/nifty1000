@@ -59,5 +59,5 @@ sty = (show.style.map(common.rating_css, subset=TF_LIST)
        .format({"Price": "{:,.2f}", "1D %": "{:+.2f}%"}))
 st.dataframe(sty, **common.STRETCH, height=680, hide_index=True,
              column_config={"Symbol": st.column_config.TextColumn(pinned=True)})
-st.download_button("⬇ Download CSV", show.to_csv(index=False).encode(), "technical_ratings.csv", "text/csv")
+st.download_button("⬇ Download CSV", show.to_csv(index=False).encode("utf-8-sig"), "technical_ratings.csv", "text/csv")
 common.footer()
