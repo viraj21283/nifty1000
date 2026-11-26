@@ -50,5 +50,5 @@ st.dataframe(sty, **common.STRETCH, height=680, hide_index=True,
              column_config={"Symbol": st.column_config.TextColumn(pinned=True)})
 st.caption(f"Green = Buy zone (RSI ≥ {BUY_AT}), red = Sell zone (RSI ≤ {SELL_AT}). "
            "RSI uses Wilder smoothing over 14 bars of each timeframe.")
-st.download_button("⬇ Download CSV", show.to_csv(index=False).encode("utf-8-sig"), "rsi.csv", "text/csv")
+st.download_button("⬇ Download CSV", show.round(2).to_csv(index=False).encode("utf-8-sig"), "rsi.csv", "text/csv")
 common.footer()
