@@ -12,7 +12,7 @@ try:
     import common
 except ModuleNotFoundError as e:
     st.error(
-        f"Missing module: `{e.name}`. Make sure engine.py, common.py and the views/ folder are in the "
+        f"Missing module: `{e.name}`. Make sure tech_engine.py, common.py and the views/ folder are in the "
         "repo next to this file, and requirements.txt (streamlit, pandas, numpy, yfinance) is in the repo root."
     )
     st.stop()

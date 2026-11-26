@@ -1,5 +1,5 @@
 """Scheduled refresh (GitHub Actions): recompute everything and save data/snapshot.csv."""
-import engine
+import tech_engine as engine
 
 if __name__ == "__main__":
     df = engine.compute_all(lambda p, m: print(f"{p:.0%} {m}", flush=True))

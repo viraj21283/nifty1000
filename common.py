@@ -6,7 +6,7 @@ import threading
 import pandas as pd
 import streamlit as st
 
-import engine
+import tech_engine as engine
 
 TF_LIST = engine.TIMEFRAMES
 _V = tuple(int(x) for x in st.__version__.split(".")[:2])
