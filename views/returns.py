@@ -44,5 +44,5 @@ st.caption(
     "(needs ≥200 days of history). 1H / 2H = change vs. the close 1 / 2 hourly bars ago; 1D = vs. previous close; "
     "1W / 1M = vs. the last close on or before 7 days / 1 month ago."
 )
-st.download_button("⬇ Download CSV", show.to_csv(index=False).encode(), "returns_sharpe.csv", "text/csv")
+st.download_button("⬇ Download CSV", show.to_csv(index=False).encode("utf-8-sig"), "returns_sharpe.csv", "text/csv")
 common.footer()
