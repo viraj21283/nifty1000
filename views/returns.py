@@ -1,7 +1,7 @@
 import streamlit as st
 
 import common
-import engine
+import tech_engine as engine
 
 CHG = ["1H %", "2H %", "1D %", "1W %", "1M %"]
 
