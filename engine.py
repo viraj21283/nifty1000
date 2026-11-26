@@ -12,8 +12,22 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-CSV_PATH = Path(__file__).parent / "data" / "ind_nifty1000_list.csv"
-SNAPSHOT_PATH = Path(__file__).parent / "data" / "snapshot.csv"
+BASE = Path(__file__).resolve().parent
+SNAPSHOT_PATH = BASE / "data" / "snapshot.csv"
+CSV_NAME = "ind_nifty1000_list.csv"
+
+
+def _find_csv() -> Path:
+    """Look for the stock list in data/, next to this file, or anywhere in the repo."""
+    for p in (BASE / "data" / CSV_NAME, BASE / CSV_NAME):
+        if p.exists():
+            return p
+    hits = sorted(BASE.rglob("*nifty1000*.csv")) or sorted(BASE.rglob("*nifty*1000*.csv"))
+    if hits:
+        return hits[0]
+    raise FileNotFoundError(
+        f"Stock list '{CSV_NAME}' not found. Upload it to the repo at data/{CSV_NAME}."
+    )
 
 TIMEFRAMES = ["1 Hour", "2 Hours", "4 Hours", "Daily", "Weekly", "Monthly"]
 CHUNK = 100
@@ -144,7 +158,7 @@ def _resample(df: pd.DataFrame, rule: str) -> pd.DataFrame:
 
 
 def load_universe() -> pd.DataFrame:
-    df = pd.read_csv(CSV_PATH)
+    df = pd.read_csv(_find_csv())
     df.columns = [c.strip() for c in df.columns]
     return df[["Company Name", "Symbol", "Industry"]]
 
@@ -192,6 +206,7 @@ def compute_all(progress: Optional[Callable[[float, str], None]] = None) -> pd.D
 def save_snapshot(df: pd.DataFrame) -> None:
     df = df.copy()
     df["updated_at"] = pd.Timestamp.now(tz="Asia/Kolkata").isoformat()
+    SNAPSHOT_PATH.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(SNAPSHOT_PATH, index=False)
 
 
