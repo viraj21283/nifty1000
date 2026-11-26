@@ -3,11 +3,23 @@
 Ratings are TradingView's aggregate technical rating (oscillators + moving
 averages) per timeframe, pulled from the public TradingView scanner endpoint.
 """
+import sys
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
-import engine
-from engine import TIMEFRAMES as TF_LIST
+# make sure sibling modules import regardless of where Streamlit is launched from
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import engine
+    from engine import TIMEFRAMES as TF_LIST
+except ModuleNotFoundError as e:
+    st.error(
+        f"Missing module: `{e.name}`. Make sure `engine.py` is in the same folder as this file "
+        "and that `requirements.txt` (streamlit, pandas, numpy, yfinance) is in the repo root."
+    )
+    st.stop()
 
 st.set_page_config(page_title="Nifty 1000 Technicals", page_icon="📈", layout="wide")
 
