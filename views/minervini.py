@@ -89,5 +89,8 @@ st.caption(
     "the Nifty 1000 of 0.4×3M + 0.2×6M + 0.2×9M + 0.2×12M price change, similar to, but not the same as, IBD's. "
     "52-week high/low use daily highs/lows. Stocks with under ~1 year of history fail the criteria they can't be tested on."
 )
-st.download_button("⬇ Download CSV", show.to_csv(index=False).encode(), "minervini_trend_template.csv", "text/csv")
+export = show.copy()
+export[CRIT] = export[CRIT].replace({"✔": "Yes", "✘": "No"})  # plain text filters cleanly in Excel
+st.download_button("⬇ Download CSV", export.to_csv(index=False).encode("utf-8-sig"),
+                   "minervini_trend_template.csv", "text/csv")
 common.footer()
